@@ -1,10 +1,11 @@
 $(function() {
 	var canvas = document.getElementById("eCanvas");
+	resizeCanvas(canvas);
 	var scene = new Scene(canvas);
 	var total_points = 50;
 
 	_.each(Array(total_points),function(index){
-		var radius = randomInt(10,3)
+		var radius = randomInt(15,3)
 		// var radius = 50;
 		var entity = scene.Circle(radius);
 		var x = randomInt(canvas.width-20,20);
@@ -46,8 +47,17 @@ $(function() {
 		}
 	}
 	scene.addToScene(line);
-
 	scene.initScene();
+	
+	function initialize(htmlCanvas) {
+		window.addEventListener('resize', function() {
+			resizeCanvas(htmlCanvas);
+		}, false);		
+	}
+	function resizeCanvas(htmlCanvas) {
+		htmlCanvas.width = window.innerWidth * 0.8;
+		htmlCanvas.height = window.innerHeight * 0.8;
+	}
 })
 
 function randomInt(max,min) {
@@ -55,71 +65,4 @@ function randomInt(max,min) {
 	min = min || 0;
 	return Math.round(Math.random()*max + min);
 };
-	// for(var i=0; i<points; i++) {
-	// 	var radius = randomInt(10);		
-	// 	var x = randomInt(canvas.width);
-	// 	var y = randomInt(canvas.height);
-	// 	var entity = Math.random() > 0.5 ? scene.Circle(radius) : scene.Rectangle(radius,radius);
-	// 	entity.setXY(x,y).setFillColor('#60b86b');
-	// 	entity.xDirection = Math.random() > 0.5 ? 1 : -1;
-	// 	entity.yDirection = Math.random() > 0.5 ? 1 : -1;
-	// 	entity.speed = randomInt(2,1);
-	// 	entity.update = function (timeDelta) {
-	// 		var attraction = 4;
-	// 		var attractionDistance = 150;
 
-	// 		if (scene.mouseX && scene.mouseY) {
-	// 			var a = scene.mouseX - this.getX();
-	// 			var b = scene.mouseY - this.getY();
-	// 			var distance = Math.sqrt( a*a + b*b );
-	// 			if (distance<attractionDistance) {
-	// 				if (Math.abs(scene.mouseX - this.getX()) > attraction) {
-	// 					var x = this.getX() + (scene.mouseX > this.getX() ? attraction : -attraction);
-	// 					this.setX(x);
-	// 				}
-	// 				if (Math.abs(scene.mouseY - this.getY()) > attraction) {
-	// 					var y = this.getY() + (scene.mouseY > this.getY() ? attraction : -attraction);
-	// 					this.setY(y);
-	// 				}							
-	// 			}
-	// 			else {
-	// 				if (this.getX()>canvas.width) {
-	// 					this.xDirection = -1;
-	// 				}
-	// 				else if (this.getX()<0) {
-	// 					this.xDirection = 1;
-	// 				}
-	// 				if (this.getY()>canvas.height) {
-	// 					this.yDirection = -1;
-	// 				}
-	// 				else if (this.getY()<0) {
-	// 					this.yDirection = 1;
-	// 				}
-	// 				var randomX = this.speed * this.xDirection;
-	// 				var randomY = this.speed * this.yDirection;
-	// 				this.setXY(this.getX() + randomX,this.getY() + randomY);
-	// 			}
-
-
-	// 		}
-	// 		else {
-	// 			if (this.getX()>canvas.width) {
-	// 				this.xDirection = -1;
-	// 			}
-	// 			else if (this.getX()<0) {
-	// 				this.xDirection = 1;
-	// 			}
-	// 			if (this.getY()>canvas.height) {
-	// 				this.yDirection = -1;
-	// 			}
-	// 			else if (this.getY()<0) {
-	// 				this.yDirection = 1;
-	// 			}
-	// 			var randomX = this.speed * this.xDirection;
-	// 			var randomY = this.speed * this.yDirection;
-	// 			this.setXY(this.getX() + randomX,this.getY() + randomY);
-	// 		}
-	// 	};
-
-	// 	scene.addToScene(entity);
-	// }
