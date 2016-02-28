@@ -3,13 +3,19 @@
 ///////////////////////////////////////////
 
 var Entity = function(ctx) {
-	// Create class properties
+	this.ctx = ctx;
+	
+	// Position
 	this.x = 0;
 	this.y = 0;
+	// Velocity
 	this.vx = 0;
 	this.vy = 0;
-	this.ctx = ctx;
-	this.onRequestAnimation;
+	// Acceleration
+	this.ax = 0;
+	this.ay = 0;
+
+	this.id;	
 	this.fillColor;
 };
 
@@ -35,17 +41,29 @@ Entity.prototype.setY = function(y) {
 	this.y = y;
 };
 
+Entity.prototype.setId = function(id) {
+	this.id = id;
+};
+
+Entity.prototype.getId = function() {
+	return this.id;
+};
+
 Entity.prototype.setFillColor = function(color) {
 	this.fillColor = color;
 	return this;
 };
 
-Entity.prototype.setAnimation = function(callback) {
-	this.onRequestAnimation = callback;
+Entity.prototype.render = function render() {
 	return this;
 };
 
-Entity.prototype.render = function render() {
+Entity.prototype.update = function update(timeDelta) {
+    // pixels / second
+	var linearSpeed = 100;
+	
+	var newX = (timeDelta / 1000) * linearSpeed;
+
 	return this;
 };
 
@@ -101,6 +119,45 @@ Rectangle.prototype.render = function() {
 }
 
 ///////////////////////////////////////////
+//////////////      LINE      /////////////
+///////////////////////////////////////////
+
+Line = function Line(ctx) {
+	// call super constructor
+	Entity.call(this,ctx);
+
+	this.xTo = 0;
+	this.yTo = 0;
+};
+
+// Line extends Entity
+Line.prototype = Object.create(Entity.prototype);
+Line.prototype.constructor = Line;
+
+// Overwrite the render
+Line.prototype.lineFrom = function(x,y) {
+	this.x = x;
+	this.y = y;
+	return this;
+}
+
+// Overwrite the render
+Line.prototype.lineTo = function(x,y) {
+	this.xTo = x;
+	this.yTo = y;
+	return this;
+}
+// Overwrite the render
+Line.prototype.render = function() {
+	this.ctx.beginPath();
+	this.ctx.moveTo(this.x, this.y);
+	this.ctx.lineTo(this.xTo, this.yTo);
+	this.ctx.stroke();
+	return this;
+}
+
+
+///////////////////////////////////////////
 //////////////     Scene     //////////////
 ///////////////////////////////////////////
 
@@ -110,7 +167,21 @@ Scene = function(canvas) {
 
 	this.mouseX;
 	this.mouseY;
+	// entities that are going to be animated
+	this.entities = {};
 	this.canvas.addEventListener('mousemove', this.handleMouseMove.bind(this),false);
+};
+
+Scene.prototype.Circle = function(radius) {
+	return new Circle(this.ctx,radius);
+};
+
+Scene.prototype.Rectangle = function(width,height) {
+	return new Rectangle(this.ctx,width,height);
+};
+
+Scene.prototype.Line = function() {
+	return new Line(this.ctx);
 };
 
 Scene.prototype.handleMouseMove = function(evt) {
@@ -131,33 +202,42 @@ Scene.prototype.clearCanvas = function() {
 	 this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 };
 
-Scene.prototype.Circle = function(radius) {
-	return new Circle(this.ctx,radius);
+Scene.prototype.addToScene = function(entity) {
+	var uniqueId = _.uniqueId('entity_');
+	entity.setId(uniqueId);
+	this.entities[uniqueId] = entity;
+	return uniqueId;
 };
 
-Scene.prototype.Rectangle = function(width,height) {
-	return new Rectangle(this.ctx,width,height);
-};
-
-Scene.prototype.animate = function(objects) {
-	var ctx = this.ctx;
+Scene.prototype.animate = function(lastFrameTimestamp) {
 	var self = this;
-		
+	
+	// The time elapsed in milisec since last frame
+	var now = new Date().getTime();
+    var timeDelta = now - lastFrameTimestamp;
+
 	// clear
 	this.clearCanvas();
 
-	_.each(objects, function iterate(obj){
-		// set new value		
-		obj.onRequestAnimation(obj);		
-		// draw object
-		obj.render();		
+	_.each(this.entities, function iterate(entity,id){
+		// update entity
+		entity.update(timeDelta);
+
+		// draw entity
+		entity.render();
 	});
 
 	// request new frame
 	requestAnimFrame(function() {
-		self.animate(objects);
+		self.animate(now);
 	});
 };
+
+Scene.prototype.initScene = function() {
+	// Get the time in miliseconds
+	var startTime = (new Date()).getTime();
+	this.animate(startTime);
+}
 
 
 window.requestAnimFrame = (function(callback) {
