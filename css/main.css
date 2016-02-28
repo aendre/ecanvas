@@ -1,0 +1,13 @@
+body {
+	background-color: #1e1e1e;
+}
+.container {
+	height: 100%;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+#eCanvas {
+	background-color: #2e2e2e;
+}
