@@ -58,6 +58,7 @@ $(function() {
 		htmlCanvas.width = window.innerWidth * 0.8;
 		htmlCanvas.height = window.innerHeight * 0.8;
 	}
+	initialize(canvas);
 })
 
 function randomInt(max,min) {
